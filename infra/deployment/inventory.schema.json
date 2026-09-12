@@ -1,0 +1,102 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://sotto-salon/infra/deployment/inventory.schema.json",
+  "title": "Deployment inventory",
+  "description": "Binds a running environment to a traceable image digest, a configuration version, and secret REFERENCES only. Secret values are never recorded here (SAL-008).",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "environment",
+    "image",
+    "config_version",
+    "secret_references",
+    "provisioning"
+  ],
+  "properties": {
+    "environment": {
+      "type": "string",
+      "enum": [
+        "development",
+        "staging",
+        "production"
+      ]
+    },
+    "provisioning": {
+      "type": "string",
+      "description": "Synthetic means no live provider resources exist yet (ARC-005 pending).",
+      "enum": [
+        "synthetic",
+        "live"
+      ],
+      "default": "synthetic"
+    },
+    "image": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "repository",
+        "digest"
+      ],
+      "properties": {
+        "repository": {
+          "type": "string",
+          "description": "Registry repository, e.g. ghcr.io/<owner>/sotto-salon-api.",
+          "minLength": 1,
+          "pattern": "^\\S+$"
+        },
+        "digest": {
+          "type": "string",
+          "description": "Immutable content digest; a floating tag is never sufficient.",
+          "pattern": "^sha256:[0-9a-f]{64}$"
+        },
+        "tag": {
+          "type": "string",
+          "description": "Optional human-readable tag for traceability. The digest is authoritative."
+        }
+      }
+    },
+    "config_version": {
+      "type": "string",
+      "description": "Identifier of the applied non-secret configuration set.",
+      "minLength": 1
+    },
+    "secret_references": {
+      "type": "array",
+      "description": "References to secrets resolved at deploy time from a manager. No values.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "name",
+          "source",
+          "path"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Environment variable the secret is injected as, e.g. SALON_SESSION_SECRET.",
+            "minLength": 1,
+            "pattern": "^\\S+$"
+          },
+          "source": {
+            "type": "string",
+            "description": "Secret manager the value is resolved from at deploy time.",
+            "enum": [
+              "vault",
+              "aws-secrets-manager",
+              "gcp-secret-manager",
+              "sops",
+              "ci-environment"
+            ]
+          },
+          "path": {
+            "type": "string",
+            "description": "Locator within the source. Must not be a literal secret value.",
+            "minLength": 1,
+            "pattern": "^\\S+$"
+          }
+        }
+      }
+    }
+  }
+}

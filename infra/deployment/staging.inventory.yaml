@@ -1,0 +1,28 @@
+# Staging deployment inventory — SYNTHETIC example.
+#
+# No live provider resources exist yet: hosting and supporting services are gated by
+# decision ARC-005. This file documents the SHAPE of a deployment record and is what CI
+# validates. It binds a traceable image digest + a configuration version + secret
+# REFERENCES, and deliberately contains NO secret values (SAL-008 / SAL-008-AC02).
+environment: staging
+provisioning: synthetic
+
+image:
+  repository: ghcr.io/sotto-salon/sotto-salon-api
+  # Immutable content digest. A floating tag (e.g. :latest) is never deployed; the digest
+  # is what gets pinned so the running artifact is traceable back to a CI build.
+  digest: "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+  tag: "0.0.0-synthetic"
+
+# Identifier of the applied non-secret configuration set (not the secrets themselves).
+config_version: "2026-09-13.1"
+
+# Secrets are resolved from the manager at deploy time and injected as env vars. Only the
+# reference (name + source + locator) is recorded here — never the value.
+secret_references:
+  - name: SALON_DATABASE_URL
+    source: vault
+    path: sotto-salon/staging/database_url
+  - name: SALON_SESSION_SECRET
+    source: vault
+    path: sotto-salon/staging/session_secret

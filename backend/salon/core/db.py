@@ -12,6 +12,7 @@ import secrets
 from datetime import UTC, datetime
 
 from sqlalchemy import DateTime, String, create_engine, func
+from sqlalchemy.engine import Engine
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, sessionmaker
 
 from salon.core.config import Settings
@@ -60,7 +61,7 @@ class SystemMetadata(Base, TimestampMixin):
     value: Mapped[str] = mapped_column(String(512), nullable=False)
 
 
-def create_db_engine(settings: Settings, connect_timeout: int = 5):
+def create_db_engine(settings: Settings, connect_timeout: int = 5) -> Engine:
     # A bounded connect timeout keeps the readiness endpoint (and tests without a live
     # database) from hanging when Postgres is unreachable.
     return create_engine(

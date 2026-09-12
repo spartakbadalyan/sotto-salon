@@ -1,0 +1,8 @@
+# Undeployed candidate template. ARC-005 is open; no live resources or secret bindings.
+environment: production
+provisioning: synthetic
+image:
+  repository: ghcr.io/sotto-salon/sotto-salon-api
+  digest: "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+config_version: candidate-template-v1
+secret_references: []

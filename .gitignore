@@ -6,6 +6,8 @@ venv/
 *.egg-info/
 .pytest_cache/
 .ruff_cache/
+.mypy_cache/
+.review-*/
 
 # Environment / secrets (never commit real secrets)
 .env
