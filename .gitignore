@@ -1,0 +1,30 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+
+# Environment / secrets (never commit real secrets)
+.env
+.env.*
+!.env.example
+
+# Node / web
+node_modules/
+apps/web/.next/
+apps/web/next-env.d.ts
+apps/web/*.tsbuildinfo
+*.tsbuildinfo
+
+# Generated API types (regenerated from the OpenAPI schema)
+contracts/generated/*.d.ts
+
+# OS / editor
+.DS_Store
+Thumbs.db
+
+# Local agent/session logs
+codex-session-*.md

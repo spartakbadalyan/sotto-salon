@@ -148,7 +148,6 @@ epics:
   - SAL-007
   - SAL-008
   - SAL-009
-  - SAL-033
 - id: EPIC-03
   title: Identity and jurisdiction access
   status: planned
@@ -157,7 +156,6 @@ epics:
   - SAL-010
   - SAL-011
   - SAL-012
-  - SAL-034
 - id: EPIC-04
   title: Profiles, media and publication
   status: planned
@@ -372,9 +370,9 @@ stories:
 - id: SAL-007
   epic_id: EPIC-02
   title: Create modular application and reproducible development
-  status: planned
+  status: in_review
   priority: P0
-  assignee: null
+  assignee: spartak.badalyan@gmail.com
   depends_on: []
   blocked_by_decisions: []
   requirements_file: planning/stories/SAL-007.md
@@ -390,16 +388,178 @@ stories:
       action: create
     - path: docs/development.md
       action: create
-    actual: []
+    actual:
+    - path: backend/pyproject.toml
+      action: create
+    - path: backend/requirements.lock
+      action: create
+    - path: backend/.python-version
+      action: create
+    - path: backend/.env.example
+      action: create
+    - path: backend/alembic.ini
+      action: create
+    - path: backend/salon/__init__.py
+      action: create
+    - path: backend/salon/core/__init__.py
+      action: create
+    - path: backend/salon/core/config.py
+      action: create
+    - path: backend/salon/core/adapters.py
+      action: create
+    - path: backend/salon/core/errors.py
+      action: create
+    - path: backend/salon/core/db.py
+      action: create
+    - path: backend/salon/core/logging.py
+      action: create
+    - path: backend/salon/identity/__init__.py
+      action: create
+    - path: backend/salon/verification/__init__.py
+      action: create
+    - path: backend/salon/countries/__init__.py
+      action: create
+    - path: backend/salon/access/__init__.py
+      action: create
+    - path: backend/salon/profiles/__init__.py
+      action: create
+    - path: backend/salon/media/__init__.py
+      action: create
+    - path: backend/salon/moderation/__init__.py
+      action: create
+    - path: backend/salon/directory/__init__.py
+      action: create
+    - path: backend/salon/billing/__init__.py
+      action: create
+    - path: backend/salon/compliance/__init__.py
+      action: create
+    - path: backend/salon/operations/__init__.py
+      action: create
+    - path: backend/salon/api/__init__.py
+      action: create
+    - path: backend/salon/api/app.py
+      action: create
+    - path: backend/salon/api/main.py
+      action: create
+    - path: backend/salon/api/routes/__init__.py
+      action: create
+    - path: backend/salon/api/routes/health.py
+      action: create
+    - path: backend/salon/api/routes/meta.py
+      action: create
+    - path: backend/salon/workers/__init__.py
+      action: create
+    - path: backend/salon/workers/main.py
+      action: create
+    - path: backend/migrations/env.py
+      action: create
+    - path: backend/migrations/script.py.mako
+      action: create
+    - path: backend/migrations/versions/0001_baseline_system_metadata.py
+      action: create
+    - path: backend/scripts/export_openapi.py
+      action: create
+    - path: backend/tests/__init__.py
+      action: create
+    - path: backend/tests/conftest.py
+      action: create
+    - path: backend/tests/test_application_smoke.py
+      action: create
+    - path: backend/tests/test_config.py
+      action: create
+    - path: contracts/package.json
+      action: create
+    - path: contracts/tsconfig.json
+      action: create
+    - path: contracts/index.ts
+      action: create
+    - path: contracts/openapi/openapi.json
+      action: create
+    - path: apps/web/package.json
+      action: create
+    - path: apps/web/tsconfig.json
+      action: create
+    - path: apps/web/next.config.mjs
+      action: create
+    - path: apps/web/src/lib/api.ts
+      action: create
+    - path: apps/web/src/app/layout.tsx
+      action: create
+    - path: apps/web/src/app/page.tsx
+      action: create
+    - path: apps/web/eslint.config.mjs
+      action: create
+    - path: compose.yaml
+      action: create
+    - path: docs/development.md
+      action: create
+    - path: .gitignore
+      action: create
+    - path: README.md
+      action: modify
   verification:
     planned:
     - Acceptance walkthrough for SAL-007 with recorded results
     - Relevant negative-path integration tests using lawful synthetic fixtures
-    evidence: []
+    evidence:
+    - '2026-09-12 AC01: CPython 3.14.3 venv; pip install -e ".[dev]" resolved fastapi 0.141.1,
+      pydantic 2.13.5, SQLAlchemy 2.0.52, alembic 1.20.0, psycopg 3.x, uvicorn; exact versions
+      frozen in backend/requirements.lock.'
+    - '2026-09-12 AC01: uvicorn salon.api.main:app served GET /health/live -> {"status":"ok"},
+      GET /api/v1/meta -> name/version/environment/adapters with no secret fields, GET /openapi.json
+      title "Sotto Salon API". apps/web npm run build (Next.js 15.5.25) compiled and type-checked
+      4 routes; the home page calls /api/v1/meta over the configured base URL.'
+    - '2026-09-12 AC02: alembic -x db_url=sqlite upgrade head then downgrade base on an empty
+      database created and removed system_metadata (opaque string id, timezone-aware UTC timestamps),
+      leaving only alembic_version. export_openapi.py output was byte-identical on repeat runs;
+      contracts npm run generate (openapi-typescript 7.13.0) + npm run check (tsc) clean.'
+    - '2026-09-12 AC03: pytest test_missing_settings_raise_redacted_diagnostics -> ConfigurationError
+      names SALON_DATABASE_URL as missing but a provided secret value never appears in the message.'
+    - '2026-09-12 AC04: pytest -> production Settings reject synthetic verification/payment adapters
+      and allow_auth_bypass; assert_adapters_allowed() fails closed as defence in depth; development
+      accepts synthetic. Full suite 24 passed; ruff check clean.'
+    - '2026-09-13 Codex review fixes verified: load_settings() reads a local .env in development
+      (confirmed) and ignores it in production (confirmed ConfigurationError); CORSMiddleware echoes
+      an allowed web origin (http://localhost:3000) and omits the header for an unknown origin, both
+      checked against a live server and locked by tests; the two readiness tests now mock the DB
+      engine so 503/200 are deterministic regardless of a local Postgres.'
   implementation:
     pull_request: null
     commits: []
-    notes: []
+    notes:
+    - Implemented on branch feature/restore-planning-and-scr007. Not committed or pushed; awaiting
+      explicit authorization per tracking policy.
+    - 'Stack pinned per architecture: FastAPI/pydantic/SQLAlchemy/alembic/psycopg backend, Next.js/React/TypeScript
+      web, generated OpenAPI contract types. The nine+ domain packages (identity, verification,
+      countries, access, profiles, media, moderation, directory, billing, compliance, operations)
+      are empty bounded-context placeholders with no business logic.'
+    - 'Synthetic-only: production refuses synthetic verification/payment adapters and auth bypass
+      (salon.core.config model validator + salon.core.adapters runtime guard). No real identities,
+      payments, or customer data.'
+    - 'Robustness: the database engine uses a bounded connect_timeout so /health/ready fails fast
+      instead of hanging when Postgres is unreachable.'
+    - 'Codex review (2026-09-13) addressed: (P1) .env is now loaded outside production so the
+      documented cp .env.example .env flow works, while production still ignores dotenv files;
+      (P1) CORSMiddleware allows the configured web origin(s) (SALON_CORS_ALLOWED_ORIGINS,
+      default localhost/127.0.0.1:3000) so the browser client can call the API; (P2) readiness
+      tests mock the DB engine instead of depending on whether a local Postgres is running.'
+    - 'Codex re-review (2026-09-13) addressed: (P1) SALON_CORS_ALLOWED_ORIGINS is annotated NoDecode
+      so a comma-separated dotenv value no longer raises SettingsError before validation (the .env
+      startup flow now works); a test loads the values through the real settings source rather than
+      the direct constructor. (P2) database_url normalizes a bare postgresql://forms to
+      postgresql+psycopg:// (psycopg 3 is the only installed driver) and rejects an explicit
+      unsupported driver at config validation, so app and migration engines cannot fall back to the
+      absent psycopg2.'
+    - 'Codex third review (2026-09-13) addressed: (P2) the database-driver rejection now uses a
+      fixed error message and never interpolates the input DSN, so a malformed URL carrying a
+      password cannot leak into the redacted configuration diagnostics (regression test added);
+      (P2) ESLint is configured via a flat config bridging next/core-web-vitals and the lint script
+      runs "eslint ." non-interactively (exit 0, clean) instead of opening Next.js interactive setup.'
+    - 'Codex fourth review (2026-09-13) addressed: (P2) load_settings() now rejects production when
+      it is resolved through a dotenv file (SALON_ENVIRONMENT=production set in .env rather than the
+      process environment), so production can never draw its database credentials or session secret
+      from a dotenv file; production set in the real process environment is still accepted. Regression
+      tests cover both paths and confirm no dotenv secret leaks into the diagnostic.'
 - id: SAL-008
   epic_id: EPIC-02
   title: Create CI and isolated deployment foundation
@@ -754,7 +914,6 @@ stories:
   depends_on:
   - SAL-016
   - SAL-018
-  - SAL-033
   blocked_by_decisions:
   - ARC-004
   - ARC-008
@@ -788,7 +947,6 @@ stories:
   - SAL-009
   - SAL-015
   - SAL-016
-  - SAL-033
   blocked_by_decisions: []
   requirements_file: planning/stories/SAL-020.md
   code_impact:
@@ -817,7 +975,6 @@ stories:
   assignee: null
   depends_on:
   - SAL-020
-  - SAL-033
   blocked_by_decisions: []
   requirements_file: planning/stories/SAL-021.md
   code_impact:
@@ -909,9 +1066,7 @@ stories:
   depends_on:
   - SAL-002
   - SAL-010
-  - SAL-013
   - SAL-014
-  - SAL-016
   - SAL-019
   - SAL-020
   blocked_by_decisions:
@@ -945,9 +1100,7 @@ stories:
   depends_on:
   - SAL-008
   - SAL-010
-  - SAL-011
   - SAL-015
-  - SAL-016
   - SAL-019
   - SAL-020
   blocked_by_decisions: []
@@ -1053,7 +1206,6 @@ stories:
   - SAL-021
   - SAL-022
   - SAL-023
-  - SAL-034
   blocked_by_decisions: []
   requirements_file: planning/stories/SAL-028.md
   code_impact:
@@ -1109,8 +1261,6 @@ stories:
   - SAL-026
   - SAL-027
   - SAL-028
-  - SAL-033
-  - SAL-034
   blocked_by_decisions:
   - ARC-001
   - ARC-002
@@ -1218,65 +1368,6 @@ stories:
     planned:
     - Acceptance walkthrough for SAL-032 with recorded results
     - Named specialist review and evidence references; record any no-go outcome
-    evidence: []
-  implementation:
-    pull_request: null
-    commits: []
-    notes: []
-- id: SAL-033
-  epic_id: EPIC-02
-  title: Deliver transactional notifications without leaking sensitive data
-  status: planned
-  priority: P0
-  assignee: null
-  depends_on:
-  - SAL-007
-  blocked_by_decisions:
-  - ARC-005
-  requirements_file: planning/stories/SAL-033.md
-  code_impact:
-    planned:
-    - path: backend/salon/notifications/
-      action: create
-    - path: backend/workers/notifications.py
-      action: create
-    - path: backend/tests/notifications/
-      action: create
-    actual: []
-  verification:
-    planned:
-    - Acceptance walkthrough for SAL-033 with recorded results
-    - Relevant negative-path integration tests using lawful synthetic fixtures
-    evidence: []
-  implementation:
-    pull_request: null
-    commits: []
-    notes: []
-- id: SAL-034
-  epic_id: EPIC-03
-  title: Implement visitor consent and ePrivacy controls
-  status: planned
-  priority: P0
-  assignee: null
-  depends_on:
-  - SAL-002
-  - SAL-007
-  blocked_by_decisions:
-  - ARC-002
-  requirements_file: planning/stories/SAL-034.md
-  code_impact:
-    planned:
-    - path: backend/salon/consent/
-      action: create
-    - path: apps/web/src/features/consent/
-      action: create
-    - path: backend/tests/consent/
-      action: create
-    actual: []
-  verification:
-    planned:
-    - Acceptance walkthrough for SAL-034 with recorded results
-    - Relevant negative-path integration tests using lawful synthetic fixtures
     evidence: []
   implementation:
     pull_request: null
