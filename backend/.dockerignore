@@ -1,0 +1,19 @@
+# Build context hygiene for infra/Dockerfile (context is backend/).
+# Keep the image small and prevent local secrets/artifacts from entering the build.
+.venv/
+.env
+.env.*
+!.env.example
+__pycache__/
+*.pyc
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.review-*/
+*.egg-info/
+build/
+dist/
+*.db
+tests/
+htmlcov/
+.coverage

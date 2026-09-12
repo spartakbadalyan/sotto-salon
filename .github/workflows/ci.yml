@@ -1,0 +1,178 @@
+name: CI
+
+# Continuous integration for every push and pull request (SAL-008).
+#
+# SECURITY (SAL-008-AC01): this workflow intentionally references NO `secrets.*` and
+# declares NO deployment `environment:`. Combined with a read-only token, that means a
+# pull request from an untrusted fork runs lint/type/test/build but is never handed any
+# deployment secret. Deployment credentials live only in the separately gated release
+# workflow (.github/workflows/release.yml, SAL-008-AC04).
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+
+# Least-privilege default token: read the repo, nothing else.
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  PYTHON_VERSION: "3.12"
+  NODE_VERSION: "20"
+  SYNTHETIC_DSN: "postgresql+psycopg://salon:salon@127.0.0.1:5432/salon"
+
+jobs:
+  backend:
+    name: Backend lint, types, tests
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: pip
+          cache-dependency-path: backend/requirements.lock
+      - name: Install pinned dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.lock
+          pip install --no-deps -e .
+          pip install -r requirements-types.lock
+      - name: Lint (ruff)
+        run: ruff check .
+      - name: Type-check (mypy)
+        run: mypy
+      - name: Tests (pytest)
+        run: pytest
+      - name: Migrations round-trip (up then down) on throwaway SQLite
+        # Proves the baseline migration has a working rollback path (SAL-008 migration
+        # rollback/forward-repair planning) without needing a live Postgres.
+        run: |
+          python -m alembic -x db_url=sqlite:///ci_tmp.db upgrade head
+          python -m alembic -x db_url=sqlite:///ci_tmp.db downgrade base
+          rm -f ci_tmp.db
+
+  contract-drift:
+    name: OpenAPI contract freshness
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: pip
+          cache-dependency-path: backend/requirements.lock
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+          cache-dependency-path: contracts/package-lock.json
+      - name: Install backend
+        working-directory: backend
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.lock
+          pip install --no-deps -e .
+      - name: Re-export OpenAPI schema
+        working-directory: backend
+        run: python scripts/export_openapi.py ../contracts/openapi/openapi.json
+      - name: Fail if the committed contract is stale
+        # The export is deterministic; any diff means the committed schema was not
+        # regenerated after an API change.
+        run: git diff --exit-code -- contracts/openapi/openapi.json
+      - name: Generate and type-check contract types
+        working-directory: contracts
+        run: |
+          npm ci
+          npm run generate
+          npm run check
+
+  web:
+    name: Web lint, types, build
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/web
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - name: Install dependencies
+        run: npm ci
+      - name: Lint (eslint)
+        run: npm run lint
+      - name: Type-check (tsc)
+        run: npm run type-check
+      - name: Build (next)
+        run: npm run build
+
+  deployment-inventory:
+    name: Deployment inventory contract
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+      - name: Validate staging inventory (digest + config version + secret refs, no values)
+        run: |
+          pip install -r infra/deployment/requirements.lock
+          python infra/deployment/validate_inventory.py infra/deployment/staging.inventory.yaml
+          python -m unittest discover -s infra/deployment/tests -v
+
+  image:
+    name: Build container image (no push)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      # Build only — no registry credentials are provided, so an untrusted PR can never
+      # push an image. Pushing by digest happens in the gated release workflow.
+      - name: Build backend image
+        run: docker build -f infra/Dockerfile -t sotto-salon-api:ci ./backend
+
+  dependency-audit:
+    name: Dependency vulnerability audit
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+      - name: Audit Python dependencies (pip-audit)
+        run: |
+          python -m pip install --upgrade pip pip-audit
+          pip-audit -r backend/requirements.lock
+          pip-audit -r backend/requirements-types.lock
+          pip-audit -r infra/deployment/requirements.lock
+      - name: Audit web dependencies (npm audit)
+        working-directory: apps/web
+        run: npm audit --audit-level=high
+      - name: Audit contract tooling (npm audit)
+        working-directory: contracts
+        run: npm audit --audit-level=high
+
+  secret-scan:
+    name: Secret scan
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Scan history and working tree for committed secrets
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          # No license/secret required for this public-style scan of our own repo.
+          GITLEAKS_ENABLE_UPLOAD_ARTIFACT: "false"

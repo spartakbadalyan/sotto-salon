@@ -563,7 +563,7 @@ stories:
 - id: SAL-008
   epic_id: EPIC-02
   title: Create CI and isolated deployment foundation
-  status: planned
+  status: in_progress
   priority: P0
   assignee: null
   depends_on:
@@ -578,16 +578,44 @@ stories:
       action: create
     - path: docs/operations/environments.md
       action: create
-    actual: []
+    actual:
+    - path: .github/workflows/ci.yml
+      action: create
+    - path: .github/workflows/release.yml
+      action: create
+    - path: infra/
+      action: create
+    - path: backend/.dockerignore
+      action: create
+    - path: backend/requirements-types.lock
+      action: create
+    - path: backend/pyproject.toml
+      action: update
+    - path: backend/salon/api/app.py
+      action: update
+    - path: backend/salon/core/db.py
+      action: update
+    - path: .gitignore
+      action: update
+    - path: docs/operations/environments.md
+      action: create
+    - path: docs/operations/SAL-008-verification.md
+      action: create
   verification:
     planned:
     - Acceptance walkthrough for SAL-008 with recorded results
     - Relevant negative-path integration tests using lawful synthetic fixtures
-    evidence: []
+    evidence:
+    - docs/operations/SAL-008-verification.md (2026-09-13 local checks and pending live acceptance)
   implementation:
     pull_request: null
     commits: []
-    notes: []
+    notes:
+    - 'Synthetic CI and candidate release foundation implemented. Releases resolve the requested
+      version tag to a commit and retain a schema-validated inventory bound to the published
+      digest and configuration commit. Inventory failures redact input values.'
+    - 'Live staging AC02/AC03 remain pending ARC-005. GitHub environment reviewer settings and
+      hosted CI/release execution are not verified locally; see operations documentation.'
 - id: SAL-009
   epic_id: EPIC-02
   title: Implement advertiser accounts and staff authorization

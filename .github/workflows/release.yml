@@ -1,0 +1,97 @@
+name: Release
+
+# Publishes a release candidate only. Live provisioning remains blocked by ARC-005.
+# Configure production required reviewers before enabling this workflow; see environments.md.
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Existing version tag to release (e.g. v0.1.0)"
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-${{ inputs.tag || github.ref_name }}
+  cancel-in-progress: false
+
+jobs:
+  resolve:
+    runs-on: ubuntu-latest
+    outputs:
+      tag: ${{ steps.resolve.outputs.tag }}
+      commit: ${{ steps.resolve.outputs.commit }}
+      repository: ${{ steps.resolve.outputs.repository }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Resolve an existing version tag to an immutable commit
+        id: resolve
+        env:
+          RELEASE_TAG: ${{ inputs.tag || github.ref_name }}
+          REPOSITORY: ${{ github.repository }}
+        run: |
+          [[ "$RELEASE_TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+(-[A-Za-z0-9][A-Za-z0-9.-]*)?$ ]] || { echo "Invalid version tag" >&2; exit 1; }
+          commit=$(git rev-parse --verify "refs/tags/$RELEASE_TAG^{commit}")
+          echo "tag=$RELEASE_TAG" >> "$GITHUB_OUTPUT"
+          echo "commit=$commit" >> "$GITHUB_OUTPUT"
+          echo "repository=ghcr.io/${REPOSITORY,,}-api" >> "$GITHUB_OUTPUT"
+
+  publish-image:
+    name: Publish candidate and record its inventory
+    needs: resolve
+    runs-on: ubuntu-latest
+    environment: production
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.resolve.outputs.commit }}
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Validate inventory template before publishing
+        run: |
+          pip install -r infra/deployment/requirements.lock
+          python infra/deployment/validate_inventory.py infra/deployment/production.inventory.yaml
+          python -m unittest discover -s infra/deployment/tests -v
+      - name: Log in to the container registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build and publish
+        id: push
+        uses: docker/build-push-action@v6
+        with:
+          context: ./backend
+          file: infra/Dockerfile
+          push: true
+          tags: ${{ needs.resolve.outputs.repository }}:${{ needs.resolve.outputs.tag }}
+          labels: org.opencontainers.image.revision=${{ needs.resolve.outputs.commit }}
+      - name: Record the published candidate
+        env:
+          IMAGE_DIGEST: ${{ steps.push.outputs.digest }}
+          IMAGE_REPOSITORY: ${{ needs.resolve.outputs.repository }}
+          RELEASE_TAG: ${{ needs.resolve.outputs.tag }}
+          CONFIG_COMMIT: ${{ needs.resolve.outputs.commit }}
+        run: |
+          python infra/deployment/record_inventory.py infra/deployment/production.inventory.yaml release.inventory.yaml
+          python infra/deployment/validate_inventory.py release.inventory.yaml --expected-digest "$IMAGE_DIGEST"
+      - name: Retain immutable release record
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-inventory-${{ needs.resolve.outputs.tag }}-${{ github.run_id }}-${{ github.run_attempt }}
+          path: release.inventory.yaml
+          if-no-files-found: error
+          retention-days: 90
