@@ -1,4 +1,4 @@
-﻿# Sotto Salon
+# Sotto Salon
 
 A planned subscription-funded directory for verified adults to publish moderated profile advertisements in approved jurisdictions. Fixed monthly advertising fees; no service payments, commissions or reservations.
 
