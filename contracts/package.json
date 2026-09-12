@@ -1,0 +1,15 @@
+{
+  "name": "@sotto-salon/contracts",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Generated TypeScript types from the backend OpenAPI schema.",
+  "scripts": {
+    "generate": "openapi-typescript openapi/openapi.json -o generated/openapi.d.ts",
+    "check": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "openapi-typescript": "^7.4.0",
+    "typescript": "^5.6.0"
+  }
+}

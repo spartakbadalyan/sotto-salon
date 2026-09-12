@@ -1,0 +1,1375 @@
+schema_version: 1
+project: Sotto Salon
+scope: Subscription-funded adult profile advertising; one-territory pilot then gated expansion
+architecture_file: docs/architecture/mvp-architecture.md
+product_file: docs/product/mvp.md
+tracking_guide: planning/README.md
+allowed_statuses:
+- planned
+- in_progress
+- blocked
+- in_review
+- done
+- cancelled
+allowed_file_actions:
+- create
+- modify
+- delete
+priorities:
+  P0: Required for first paid pilot
+  P1: Optional independent territory expansion
+tracking_policy:
+  paths: Workspace-relative; proposed files may not exist yet
+  actual_changes: Record exact files after implementation
+  verification: Record actual results, not planned test names
+  commits: No commit or push authorized by this backlog
+  completion: Requirements documents do not constitute completed implementation
+  decisions: Open decisions block the live activity in blocks; synthetic work can proceed
+decisions:
+- id: ARC-001
+  title: Pilot entity and jurisdiction
+  status: open
+  proposed_default: Belgium first candidate; disabled until reviewed
+  blocks: Real onboarding and first-territory launch
+- id: ARC-002
+  title: Legal applicability and sensitive-data design
+  status: open
+  proposed_default: Article-level DSA register, DPIA and reviewed disclosure/billing terms
+  blocks: Real personal-data processing and public advertising
+- id: ARC-003
+  title: Identity and age provider
+  status: open
+  proposed_default: Evaluate Yoti; exact-model acceptance required
+  blocks: Live advertiser KYC and visitor age processing
+- id: ARC-004
+  title: Subscription acquiring
+  status: open
+  proposed_default: Evaluate CCBill and alternatives; none approved yet
+  blocks: Live subscription collection
+- id: ARC-005
+  title: Hosting and supporting services
+  status: open
+  proposed_default: Evaluate Infomaniak and Leaseweb; service-specific acceptance
+  blocks: Cloud procurement and live hosting/data processing
+- id: ARC-006
+  title: Retention and recovery policy
+  status: open
+  proposed_default: Data-class schedule; proposed RPO 24h and RTO 8h
+  blocks: Production retention, backups and restoration
+- id: ARC-007
+  title: Content policy and moderation capacity
+  status: open
+  proposed_default: Non-explicit self-ads; human review and urgent rota
+  blocks: Real uploads and publication
+- id: ARC-008
+  title: Price, tax and renewal policy
+  status: open
+  proposed_default: One fixed monthly plan; price and terms unresolved
+  blocks: Live price offers and recurring billing
+- id: ARC-009
+  title: Netherlands expansion eligibility
+  status: open
+  proposed_default: Independent local legal/provider/operations review
+  blocks: Netherlands territory activation
+- id: ARC-010
+  title: Switzerland expansion eligibility
+  status: open
+  proposed_default: Independent canton/locality legal/provider/operations review
+  blocks: Switzerland territory activation
+release_gates:
+  synthetic_staging:
+    decisions: []
+    stories:
+    - SAL-007
+    - SAL-008
+    - SAL-009
+    approvals:
+    - Engineering review of synthetic-only deployment
+    note: No customer IDs, content or real charges
+  paid_pilot:
+    decisions:
+    - ARC-001
+    - ARC-002
+    - ARC-003
+    - ARC-004
+    - ARC-005
+    - ARC-006
+    - ARC-007
+    - ARC-008
+    stories:
+    - SAL-029
+    approvals:
+    - Country legal review accepted
+    - Exact-model provider contracts approved
+    - Privacy/security assessments accepted
+    - Moderation and support coverage staffed
+    - Accountable operator release approval
+    note: All transitive dependencies done; decisions approved for pilot scope
+  pilot_review:
+    decisions: []
+    stories:
+    - SAL-030
+    approvals:
+    - Recorded continue narrow or stop decision
+    note: Observation occurs after launch
+  netherlands:
+    decisions:
+    - ARC-009
+    stories:
+    - SAL-031
+    approvals:
+    - Dutch territory launch with renewed provider/operations evidence
+    note: Depends on pilot review; does not require Switzerland
+  switzerland:
+    decisions:
+    - ARC-010
+    stories:
+    - SAL-032
+    approvals:
+    - Swiss locality launch with renewed provider/operations evidence
+    note: Depends on pilot review; does not require Netherlands
+epics:
+- id: EPIC-01
+  title: Feasibility and provider diligence
+  status: planned
+  goal: Prove exact-model eligibility before live commitments
+  stories:
+  - SAL-001
+  - SAL-002
+  - SAL-003
+  - SAL-004
+  - SAL-005
+  - SAL-006
+- id: EPIC-02
+  title: Application and security foundation
+  status: planned
+  goal: Create a reproducible isolated authorized application
+  stories:
+  - SAL-007
+  - SAL-008
+  - SAL-009
+- id: EPIC-03
+  title: Identity and jurisdiction access
+  status: planned
+  goal: Verify advertisers and enforce territory/visitor controls
+  stories:
+  - SAL-010
+  - SAL-011
+  - SAL-012
+- id: EPIC-04
+  title: Profiles, media and publication
+  status: planned
+  goal: Publish only eligible consented approved revisions
+  stories:
+  - SAL-013
+  - SAL-014
+  - SAL-015
+  - SAL-016
+- id: EPIC-05
+  title: Platform subscription billing
+  status: planned
+  goal: Charge fixed monthly ad fees with reliable cancellation
+  stories:
+  - SAL-017
+  - SAL-018
+  - SAL-019
+- id: EPIC-06
+  title: DSA redress and safety operations
+  status: planned
+  goal: Provide reports, appeals, transparency and escalation
+  stories:
+  - SAL-020
+  - SAL-021
+  - SAL-022
+  - SAL-023
+- id: EPIC-07
+  title: Privacy, reliability and launch quality
+  status: planned
+  goal: Prove rights fulfilment, recovery, security and usability
+  stories:
+  - SAL-024
+  - SAL-025
+  - SAL-026
+  - SAL-027
+  - SAL-028
+- id: EPIC-08
+  title: Pilot and territorial expansion
+  status: planned
+  goal: Launch deliberately and expand on renewed evidence
+  stories:
+  - SAL-029
+  - SAL-030
+  - SAL-031
+  - SAL-032
+stories:
+- id: SAL-001
+  epic_id: EPIC-01
+  title: Confirm business model and first-country eligibility
+  status: planned
+  priority: P0
+  assignee: null
+  depends_on: []
+  blocked_by_decisions: []
+  requirements_file: planning/stories/SAL-001.md
+  code_impact:
+    planned:
+    - path: docs/legal/country-matrix.md
+      action: create
+    - path: docs/legal/merchant-model.md
+      action: create
+    actual: []
+  verification:
+    planned:
+    - Acceptance walkthrough for SAL-001 with recorded results
+    - Named specialist review and evidence references; record any no-go outcome
+    evidence: []
+  implementation:
+    pull_request: null
+    commits: []
+    notes: []
+- id: SAL-002
+  epic_id: EPIC-01
+  title: Establish compliance, privacy and commercial policies
+  status: planned
+  priority: P0
+  assignee: null
+  depends_on:
+  - SAL-001
+  blocked_by_decisions: []
+  requirements_file: planning/stories/SAL-002.md
+  code_impact:
+    planned:
+    - path: docs/legal/obligations-register.md
+      action: create
+    - path: docs/privacy/dpia.md
+      action: create
+    - path: docs/legal/subscription-policy.md
+      action: create
+    actual: []
+  verification:
+    planned:
+    - Acceptance walkthrough for SAL-002 with recorded results
+    - Named specialist review and evidence references; record any no-go outcome
+    evidence: []
+  implementation:
+    pull_request: null
+    commits: []
+    notes: []
+- id: SAL-003
+  epic_id: EPIC-01
+  title: Evaluate advertiser identity and visitor age providers
+  status: planned
+  priority: P0
+  assignee: null
+  depends_on:
+  - SAL-001
+  - SAL-002
+  blocked_by_decisions: []
+  requirements_file: planning/stories/SAL-003.md
+  code_impact:
+    planned:
+    - path: docs/providers/identity-evaluation.md
+      action: create
+    - path: contracts/verification-provider.md
+      action: create
+    actual: []
+  verification:
+    planned:
+    - Acceptance walkthrough for SAL-003 with recorded results
+    - Named specialist review and evidence references; record any no-go outcome
+    evidence: []
+  implementation:
+    pull_request: null
+    commits: []
+    notes: []
+- id: SAL-004
+  epic_id: EPIC-01
+  title: Obtain subscription acquiring feasibility and economics
+  status: planned
+  priority: P0
+  assignee: null
+  depends_on:
+  - SAL-001
+  - SAL-002
+  blocked_by_decisions: []
+  requirements_file: planning/stories/SAL-004.md
+  code_impact:
+    planned:
+    - path: docs/providers/payment-underwriting.md
+      action: create
+    - path: docs/finance/unit-economics.md
+      action: create
+    - path: contracts/billing-provider.md
+      action: create
+    actual: []
+  verification:
+    planned:
+    - Acceptance walkthrough for SAL-004 with recorded results
+    - Named specialist review and evidence references; record any no-go outcome
+    evidence: []
+  implementation:
+    pull_request: null
+    commits: []
+    notes: []
+- id: SAL-005
+  epic_id: EPIC-01
+  title: Confirm hosting and supporting service eligibility
+  status: planned
+  priority: P0
+  assignee: null
+  depends_on:
+  - SAL-001
+  - SAL-002
+  blocked_by_decisions: []
+  requirements_file: planning/stories/SAL-005.md
+  code_impact:
+    planned:
+    - path: docs/providers/hosting-evaluation.md
+      action: create
+    - path: docs/operations/provider-exit.md
+      action: create
+    actual: []
+  verification:
+    planned:
+    - Acceptance walkthrough for SAL-005 with recorded results
+    - Named specialist review and evidence references; record any no-go outcome
+    evidence: []
+  implementation:
+    pull_request: null
+    commits: []
+    notes: []
+- id: SAL-006
+  epic_id: EPIC-01
+  title: Define content rules and staffed moderation operations
+  status: planned
+  priority: P0
+  assignee: null
+  depends_on:
+  - SAL-001
+  - SAL-002
+  blocked_by_decisions: []
+  requirements_file: planning/stories/SAL-006.md
+  code_impact:
+    planned:
+    - path: docs/safety/content-policy.md
+      action: create
+    - path: docs/safety/moderation-runbook.md
+      action: create
+    - path: evaluation/moderation-policy/
+      action: create
+    actual: []
+  verification:
+    planned:
+    - Acceptance walkthrough for SAL-006 with recorded results
+    - Named specialist review and evidence references; record any no-go outcome
+    evidence: []
+  implementation:
+    pull_request: null
+    commits: []
+    notes: []
+- id: SAL-007
+  epic_id: EPIC-02
+  title: Create modular application and reproducible development
+  status: in_review
+  priority: P0
+  assignee: spartak.badalyan@gmail.com
+  depends_on: []
+  blocked_by_decisions: []
+  requirements_file: planning/stories/SAL-007.md
+  code_impact:
+    planned:
+    - path: apps/web/
+      action: create
+    - path: backend/
+      action: create
+    - path: contracts/openapi/
+      action: create
+    - path: compose.yaml
+      action: create
+    - path: docs/development.md
+      action: create
+    actual:
+    - path: backend/pyproject.toml
+      action: create
+    - path: backend/requirements.lock
+      action: create
+    - path: backend/.python-version
+      action: create
+    - path: backend/.env.example
+      action: create
+    - path: backend/alembic.ini
+      action: create
+    - path: backend/salon/__init__.py
+      action: create
+    - path: backend/salon/core/__init__.py
+      action: create
+    - path: backend/salon/core/config.py
+      action: create
+    - path: backend/salon/core/adapters.py
+      action: create
+    - path: backend/salon/core/errors.py
+      action: create
+    - path: backend/salon/core/db.py
+      action: create
+    - path: backend/salon/core/logging.py
+      action: create
+    - path: backend/salon/identity/__init__.py
+      action: create
+    - path: backend/salon/verification/__init__.py
+      action: create
+    - path: backend/salon/countries/__init__.py
+      action: create
+    - path: backend/salon/access/__init__.py
+      action: create
+    - path: backend/salon/profiles/__init__.py
+      action: create
+    - path: backend/salon/media/__init__.py
+      action: create
+    - path: backend/salon/moderation/__init__.py
+      action: create
+    - path: backend/salon/directory/__init__.py
+      action: create
+    - path: backend/salon/billing/__init__.py
+      action: create
+    - path: backend/salon/compliance/__init__.py
+      action: create
+    - path: backend/salon/operations/__init__.py
+      action: create
+    - path: backend/salon/api/__init__.py
+      action: create
+    - path: backend/salon/api/app.py
+      action: create
+    - path: backend/salon/api/main.py
+      action: create
+    - path: backend/salon/api/routes/__init__.py
+      action: create
+    - path: backend/salon/api/routes/health.py
+      action: create
+    - path: backend/salon/api/routes/meta.py
+      action: create
+    - path: backend/salon/workers/__init__.py
+      action: create
+    - path: backend/salon/workers/main.py
+      action: create
+    - path: backend/migrations/env.py
+      action: create
+    - path: backend/migrations/script.py.mako
+      action: create
+    - path: backend/migrations/versions/0001_baseline_system_metadata.py
+      action: create
+    - path: backend/scripts/export_openapi.py
+      action: create
+    - path: backend/tests/__init__.py
+      action: create
+    - path: backend/tests/conftest.py
+      action: create
+    - path: backend/tests/test_application_smoke.py
+      action: create
+    - path: backend/tests/test_config.py
+      action: create
+    - path: contracts/package.json
+      action: create
+    - path: contracts/tsconfig.json
+      action: create
+    - path: contracts/index.ts
+      action: create
+    - path: contracts/openapi/openapi.json
+      action: create
+    - path: apps/web/package.json
+      action: create
+    - path: apps/web/tsconfig.json
+      action: create
+    - path: apps/web/next.config.mjs
+      action: create
+    - path: apps/web/src/lib/api.ts
+      action: create
+    - path: apps/web/src/app/layout.tsx
+      action: create
+    - path: apps/web/src/app/page.tsx
+      action: create
+    - path: apps/web/eslint.config.mjs
+      action: create
+    - path: compose.yaml
+      action: create
+    - path: docs/development.md
+      action: create
+    - path: .gitignore
+      action: create
+    - path: README.md
+      action: modify
+  verification:
+    planned:
+    - Acceptance walkthrough for SAL-007 with recorded results
+    - Relevant negative-path integration tests using lawful synthetic fixtures
+    evidence:
+    - '2026-09-12 AC01: CPython 3.14.3 venv; pip install -e ".[dev]" resolved fastapi 0.141.1,
+      pydantic 2.13.5, SQLAlchemy 2.0.52, alembic 1.20.0, psycopg 3.x, uvicorn; exact versions
+      frozen in backend/requirements.lock.'
+    - '2026-09-12 AC01: uvicorn salon.api.main:app served GET /health/live -> {"status":"ok"},
+      GET /api/v1/meta -> name/version/environment/adapters with no secret fields, GET /openapi.json
+      title "Sotto Salon API". apps/web npm run build (Next.js 15.5.25) compiled and type-checked
+      4 routes; the home page calls /api/v1/meta over the configured base URL.'
+    - '2026-09-12 AC02: alembic -x db_url=sqlite upgrade head then downgrade base on an empty
+      database created and removed system_metadata (opaque string id, timezone-aware UTC timestamps),
+      leaving only alembic_version. export_openapi.py output was byte-identical on repeat runs;
+      contracts npm run generate (openapi-typescript 7.13.0) + npm run check (tsc) clean.'
+    - '2026-09-12 AC03: pytest test_missing_settings_raise_redacted_diagnostics -> ConfigurationError
+      names SALON_DATABASE_URL as missing but a provided secret value never appears in the message.'
+    - '2026-09-12 AC04: pytest -> production Settings reject synthetic verification/payment adapters
+      and allow_auth_bypass; assert_adapters_allowed() fails closed as defence in depth; development
+      accepts synthetic. Full suite 24 passed; ruff check clean.'
+    - '2026-09-13 Codex review fixes verified: load_settings() reads a local .env in development
+      (confirmed) and ignores it in production (confirmed ConfigurationError); CORSMiddleware echoes
+      an allowed web origin (http://localhost:3000) and omits the header for an unknown origin, both
+      checked against a live server and locked by tests; the two readiness tests now mock the DB
+      engine so 503/200 are deterministic regardless of a local Postgres.'
+  implementation:
+    pull_request: null
+    commits: []
+    notes:
+    - Implemented on branch feature/restore-planning-and-scr007. Not committed or pushed; awaiting
+      explicit authorization per tracking policy.
+    - 'Stack pinned per architecture: FastAPI/pydantic/SQLAlchemy/alembic/psycopg backend, Next.js/React/TypeScript
+      web, generated OpenAPI contract types. The nine+ domain packages (identity, verification,
+      countries, access, profiles, media, moderation, directory, billing, compliance, operations)
+      are empty bounded-context placeholders with no business logic.'
+    - 'Synthetic-only: production refuses synthetic verification/payment adapters and auth bypass
+      (salon.core.config model validator + salon.core.adapters runtime guard). No real identities,
+      payments, or customer data.'
+    - 'Robustness: the database engine uses a bounded connect_timeout so /health/ready fails fast
+      instead of hanging when Postgres is unreachable.'
+    - 'Codex review (2026-09-13) addressed: (P1) .env is now loaded outside production so the
+      documented cp .env.example .env flow works, while production still ignores dotenv files;
+      (P1) CORSMiddleware allows the configured web origin(s) (SALON_CORS_ALLOWED_ORIGINS,
+      default localhost/127.0.0.1:3000) so the browser client can call the API; (P2) readiness
+      tests mock the DB engine instead of depending on whether a local Postgres is running.'
+    - 'Codex re-review (2026-09-13) addressed: (P1) SALON_CORS_ALLOWED_ORIGINS is annotated NoDecode
+      so a comma-separated dotenv value no longer raises SettingsError before validation (the .env
+      startup flow now works); a test loads the values through the real settings source rather than
+      the direct constructor. (P2) database_url normalizes a bare postgresql://forms to
+      postgresql+psycopg:// (psycopg 3 is the only installed driver) and rejects an explicit
+      unsupported driver at config validation, so app and migration engines cannot fall back to the
+      absent psycopg2.'
+    - 'Codex third review (2026-09-13) addressed: (P2) the database-driver rejection now uses a
+      fixed error message and never interpolates the input DSN, so a malformed URL carrying a
+      password cannot leak into the redacted configuration diagnostics (regression test added);
+      (P2) ESLint is configured via a flat config bridging next/core-web-vitals and the lint script
+      runs "eslint ." non-interactively (exit 0, clean) instead of opening Next.js interactive setup.'
+    - 'Codex fourth review (2026-09-13) addressed: (P2) load_settings() now rejects production when
+      it is resolved through a dotenv file (SALON_ENVIRONMENT=production set in .env rather than the
+      process environment), so production can never draw its database credentials or session secret
+      from a dotenv file; production set in the real process environment is still accepted. Regression
+      tests cover both paths and confirm no dotenv secret leaks into the diagnostic.'
+- id: SAL-008
+  epic_id: EPIC-02
+  title: Create CI and isolated deployment foundation
+  status: planned
+  priority: P0
+  assignee: null
+  depends_on:
+  - SAL-007
+  blocked_by_decisions: []
+  requirements_file: planning/stories/SAL-008.md
+  code_impact:
+    planned:
+    - path: infra/
+      action: create
+    - path: .github/workflows/ci.yml
+      action: create
+    - path: docs/operations/environments.md
+      action: create
+    actual: []
+  verification:
+    planned:
+    - Acceptance walkthrough for SAL-008 with recorded results
+    - Relevant negative-path integration tests using lawful synthetic fixtures
+    evidence: []
+  implementation:
+    pull_request: null
+    commits: []
+    notes: []
+- id: SAL-009
+  epic_id: EPIC-02
+  title: Implement advertiser accounts and staff authorization
+  status: planned
+  priority: P0
+  assignee: null
+  depends_on:
+  - SAL-007
+  blocked_by_decisions: []
+  requirements_file: planning/stories/SAL-009.md
+  code_impact:
+    planned:
+    - path: backend/salon/identity/
+      action: create
+    - path: apps/web/src/features/auth/
+      action: create
+    - path: backend/tests/identity/
+      action: create
+    actual: []
+  verification:
+    planned:
+    - Acceptance walkthrough for SAL-009 with recorded results
+    - Relevant negative-path integration tests using lawful synthetic fixtures
+    evidence: []
+  implementation:
+    pull_request: null
+    commits: []
+    notes: []
+- id: SAL-010
+  epic_id: EPIC-03
+  title: Integrate advertiser KYC and consent-aware onboarding
+  status: planned
+  priority: P0
+  assignee: null
+  depends_on:
+  - SAL-003
+  - SAL-008
+  - SAL-009
+  blocked_by_decisions:
+  - ARC-002
+  - ARC-003
+  - ARC-005
+  requirements_file: planning/stories/SAL-010.md
+  code_impact:
+    planned:
+    - path: backend/salon/verification/
+      action: create
+    - path: apps/web/src/features/verification/
+      action: create
+    - path: backend/tests/verification/
+      action: create
+    actual: []
+  verification:
+    planned:
+    - Acceptance walkthrough for SAL-010 with recorded results
+    - Relevant negative-path integration tests using lawful synthetic fixtures
+    evidence: []
+  implementation:
+    pull_request: null
+    commits: []
+    notes: []
+- id: SAL-011
+  epic_id: EPIC-03
+  title: Enforce jurisdiction and local eligibility policies
+  status: planned
+  priority: P0
+  assignee: null
+  depends_on:
+  - SAL-001
+  - SAL-009
+  blocked_by_decisions:
+  - ARC-001
+  requirements_file: planning/stories/SAL-011.md
+  code_impact:
+    planned:
+    - path: backend/salon/countries/
+      action: create
+    - path: backend/tests/countries/
+      action: create
+    - path: apps/web/src/features/location/
+      action: create
+    actual: []
+  verification:
+    planned:
+    - Acceptance walkthrough for SAL-011 with recorded results
+    - Relevant negative-path integration tests using lawful synthetic fixtures
+    evidence: []
+  implementation:
+    pull_request: null
+    commits: []
+    notes: []
+- id: SAL-012
+  epic_id: EPIC-03
+  title: Implement privacy-preserving visitor age access
+  status: planned
+  priority: P0
+  assignee: null
+  depends_on:
+  - SAL-002
+  - SAL-003
+  - SAL-008
+  - SAL-011
+  blocked_by_decisions:
+  - ARC-001
+  - ARC-002
+  - ARC-003
+  - ARC-005
+  requirements_file: planning/stories/SAL-012.md
+  code_impact:
+    planned:
+    - path: backend/salon/access/
+      action: create
+    - path: apps/web/src/features/age-access/
+      action: create
+    - path: backend/tests/access/
+      action: create
+    actual: []
+  verification:
+    planned:
+    - Acceptance walkthrough for SAL-012 with recorded results
+    - Relevant negative-path integration tests using lawful synthetic fixtures
+    evidence: []
+  implementation:
+    pull_request: null
+    commits: []
+    notes: []
+- id: SAL-013
+  epic_id: EPIC-04
+  title: Build privately owned profile drafts and revisions
+  status: planned
+  priority: P0
+  assignee: null
+  depends_on:
+  - SAL-009
+  - SAL-011
+  blocked_by_decisions: []
+  requirements_file: planning/stories/SAL-013.md
+  code_impact:
+    planned:
+    - path: backend/salon/profiles/
+      action: create
+    - path: apps/web/src/features/profiles/
+      action: create
+    - path: backend/tests/profiles/
+      action: create
+    actual: []
+  verification:
+    planned:
+    - Acceptance walkthrough for SAL-013 with recorded results
+    - Relevant negative-path integration tests using lawful synthetic fixtures
+    evidence: []
+  implementation:
+    pull_request: null
+    commits: []
+    notes: []
+- id: SAL-014
+  epic_id: EPIC-04
+  title: Implement quarantined image ingestion and consent records
+  status: planned
+  priority: P0
+  assignee: null
+  depends_on:
+  - SAL-006
+  - SAL-008
+  - SAL-013
+  blocked_by_decisions:
+  - ARC-002
+  - ARC-005
+  - ARC-007
+  requirements_file: planning/stories/SAL-014.md
+  code_impact:
+    planned:
+    - path: backend/salon/media/
+      action: create
+    - path: backend/workers/media.py
+      action: create
+    - path: backend/tests/media/
+      action: create
+    actual: []
+  verification:
+    planned:
+    - Acceptance walkthrough for SAL-014 with recorded results
+    - Relevant negative-path integration tests using lawful synthetic fixtures
+    evidence: []
+  implementation:
+    pull_request: null
+    commits: []
+    notes: []
+- id: SAL-015
+  epic_id: EPIC-04
+  title: Implement moderation filters and human review console
+  status: planned
+  priority: P0
+  assignee: null
+  depends_on:
+  - SAL-006
+  - SAL-009
+  - SAL-013
+  - SAL-014
+  blocked_by_decisions:
+  - ARC-007
+  requirements_file: planning/stories/SAL-015.md
+  code_impact:
+    planned:
+    - path: backend/salon/moderation/
+      action: create
+    - path: apps/web/src/features/moderation/
+      action: create
+    - path: backend/tests/moderation/
+      action: create
+    actual: []
+  verification:
+    planned:
+    - Acceptance walkthrough for SAL-015 with recorded results
+    - Relevant negative-path integration tests using lawful synthetic fixtures
+    evidence: []
+  implementation:
+    pull_request: null
+    commits: []
+    notes: []
+- id: SAL-016
+  epic_id: EPIC-04
+  title: Build revocable publication and directory discovery
+  status: planned
+  priority: P0
+  assignee: null
+  depends_on:
+  - SAL-010
+  - SAL-011
+  - SAL-012
+  - SAL-013
+  - SAL-014
+  - SAL-015
+  blocked_by_decisions: []
+  requirements_file: planning/stories/SAL-016.md
+  code_impact:
+    planned:
+    - path: backend/salon/directory/
+      action: create
+    - path: apps/web/src/features/directory/
+      action: create
+    - path: backend/tests/directory/
+      action: create
+    actual: []
+  verification:
+    planned:
+    - Acceptance walkthrough for SAL-016 with recorded results
+    - Relevant negative-path integration tests using lawful synthetic fixtures
+    evidence: []
+  implementation:
+    pull_request: null
+    commits: []
+    notes: []
+- id: SAL-017
+  epic_id: EPIC-05
+  title: Define plans and transparent subscription purchase terms
+  status: planned
+  priority: P0
+  assignee: null
+  depends_on:
+  - SAL-002
+  - SAL-004
+  - SAL-009
+  blocked_by_decisions:
+  - ARC-008
+  requirements_file: planning/stories/SAL-017.md
+  code_impact:
+    planned:
+    - path: backend/salon/billing/plans.py
+      action: create
+    - path: apps/web/src/features/subscriptions/
+      action: create
+    - path: backend/tests/billing/test_plans.py
+      action: create
+    actual: []
+  verification:
+    planned:
+    - Acceptance walkthrough for SAL-017 with recorded results
+    - Relevant negative-path integration tests using lawful synthetic fixtures
+    evidence: []
+  implementation:
+    pull_request: null
+    commits: []
+    notes: []
+- id: SAL-018
+  epic_id: EPIC-05
+  title: Integrate hosted subscription checkout and event ingestion
+  status: planned
+  priority: P0
+  assignee: null
+  depends_on:
+  - SAL-004
+  - SAL-008
+  - SAL-017
+  blocked_by_decisions:
+  - ARC-004
+  - ARC-005
+  - ARC-008
+  requirements_file: planning/stories/SAL-018.md
+  code_impact:
+    planned:
+    - path: backend/salon/billing/provider.py
+      action: create
+    - path: backend/salon/billing/events.py
+      action: create
+    - path: backend/tests/billing/test_checkout.py
+      action: create
+    actual: []
+  verification:
+    planned:
+    - Acceptance walkthrough for SAL-018 with recorded results
+    - Relevant negative-path integration tests using lawful synthetic fixtures
+    evidence: []
+  implementation:
+    pull_request: null
+    commits: []
+    notes: []
+- id: SAL-019
+  epic_id: EPIC-05
+  title: Implement renewal, cancellation and entitlement reconciliation
+  status: planned
+  priority: P0
+  assignee: null
+  depends_on:
+  - SAL-016
+  - SAL-018
+  blocked_by_decisions:
+  - ARC-004
+  - ARC-008
+  requirements_file: planning/stories/SAL-019.md
+  code_impact:
+    planned:
+    - path: backend/salon/billing/lifecycle.py
+      action: create
+    - path: backend/workers/billing.py
+      action: create
+    - path: backend/tests/billing/test_lifecycle.py
+      action: create
+    actual: []
+  verification:
+    planned:
+    - Acceptance walkthrough for SAL-019 with recorded results
+    - Relevant negative-path integration tests using lawful synthetic fixtures
+    evidence: []
+  implementation:
+    pull_request: null
+    commits: []
+    notes: []
+- id: SAL-020
+  epic_id: EPIC-06
+  title: Implement notice intake and reasoned moderation decisions
+  status: planned
+  priority: P0
+  assignee: null
+  depends_on:
+  - SAL-002
+  - SAL-009
+  - SAL-015
+  - SAL-016
+  blocked_by_decisions: []
+  requirements_file: planning/stories/SAL-020.md
+  code_impact:
+    planned:
+    - path: backend/salon/compliance/notices.py
+      action: create
+    - path: apps/web/src/features/reporting/
+      action: create
+    - path: backend/tests/compliance/test_notices.py
+      action: create
+    actual: []
+  verification:
+    planned:
+    - Acceptance walkthrough for SAL-020 with recorded results
+    - Relevant negative-path integration tests using lawful synthetic fixtures
+    evidence: []
+  implementation:
+    pull_request: null
+    commits: []
+    notes: []
+- id: SAL-021
+  epic_id: EPIC-06
+  title: Implement human appeals and dispute escalation
+  status: planned
+  priority: P0
+  assignee: null
+  depends_on:
+  - SAL-020
+  blocked_by_decisions: []
+  requirements_file: planning/stories/SAL-021.md
+  code_impact:
+    planned:
+    - path: backend/salon/compliance/appeals.py
+      action: create
+    - path: apps/web/src/features/appeals/
+      action: create
+    - path: backend/tests/compliance/test_appeals.py
+      action: create
+    actual: []
+  verification:
+    planned:
+    - Acceptance walkthrough for SAL-021 with recorded results
+    - Relevant negative-path integration tests using lawful synthetic fixtures
+    evidence: []
+  implementation:
+    pull_request: null
+    commits: []
+    notes: []
+- id: SAL-022
+  epic_id: EPIC-06
+  title: Build DSA transparency and advertisement disclosures
+  status: planned
+  priority: P0
+  assignee: null
+  depends_on:
+  - SAL-002
+  - SAL-016
+  - SAL-020
+  - SAL-021
+  blocked_by_decisions: []
+  requirements_file: planning/stories/SAL-022.md
+  code_impact:
+    planned:
+    - path: backend/salon/compliance/transparency.py
+      action: create
+    - path: apps/web/src/features/transparency/
+      action: create
+    - path: backend/tests/compliance/test_transparency.py
+      action: create
+    actual: []
+  verification:
+    planned:
+    - Acceptance walkthrough for SAL-022 with recorded results
+    - Relevant negative-path integration tests using lawful synthetic fixtures
+    evidence: []
+  implementation:
+    pull_request: null
+    commits: []
+    notes: []
+- id: SAL-023
+  epic_id: EPIC-06
+  title: Implement urgent escalation and authority request handling
+  status: planned
+  priority: P0
+  assignee: null
+  depends_on:
+  - SAL-001
+  - SAL-002
+  - SAL-006
+  - SAL-020
+  blocked_by_decisions: []
+  requirements_file: planning/stories/SAL-023.md
+  code_impact:
+    planned:
+    - path: backend/salon/compliance/authority.py
+      action: create
+    - path: docs/operations/urgent-response.md
+      action: create
+    - path: backend/tests/compliance/test_authority.py
+      action: create
+    actual: []
+  verification:
+    planned:
+    - Acceptance walkthrough for SAL-023 with recorded results
+    - Relevant negative-path integration tests using lawful synthetic fixtures
+    evidence: []
+  implementation:
+    pull_request: null
+    commits: []
+    notes: []
+- id: SAL-024
+  epic_id: EPIC-07
+  title: Implement privacy rights and retention enforcement
+  status: planned
+  priority: P0
+  assignee: null
+  depends_on:
+  - SAL-002
+  - SAL-010
+  - SAL-014
+  - SAL-019
+  - SAL-020
+  blocked_by_decisions:
+  - ARC-002
+  - ARC-006
+  requirements_file: planning/stories/SAL-024.md
+  code_impact:
+    planned:
+    - path: backend/salon/operations/privacy.py
+      action: create
+    - path: backend/workers/retention.py
+      action: create
+    - path: backend/tests/operations/test_privacy.py
+      action: create
+    actual: []
+  verification:
+    planned:
+    - Acceptance walkthrough for SAL-024 with recorded results
+    - Relevant negative-path integration tests using lawful synthetic fixtures
+    evidence: []
+  implementation:
+    pull_request: null
+    commits: []
+    notes: []
+- id: SAL-025
+  epic_id: EPIC-07
+  title: Implement privacy-safe monitoring and operational controls
+  status: planned
+  priority: P0
+  assignee: null
+  depends_on:
+  - SAL-008
+  - SAL-010
+  - SAL-015
+  - SAL-019
+  - SAL-020
+  blocked_by_decisions: []
+  requirements_file: planning/stories/SAL-025.md
+  code_impact:
+    planned:
+    - path: backend/salon/operations/telemetry.py
+      action: create
+    - path: infra/monitoring/
+      action: create
+    - path: docs/operations/on-call.md
+      action: create
+    actual: []
+  verification:
+    planned:
+    - Acceptance walkthrough for SAL-025 with recorded results
+    - Relevant negative-path integration tests using lawful synthetic fixtures
+    evidence: []
+  implementation:
+    pull_request: null
+    commits: []
+    notes: []
+- id: SAL-026
+  epic_id: EPIC-07
+  title: Prove backup recovery, deletion replay and provider exit
+  status: planned
+  priority: P0
+  assignee: null
+  depends_on:
+  - SAL-005
+  - SAL-008
+  - SAL-024
+  - SAL-025
+  blocked_by_decisions:
+  - ARC-005
+  - ARC-006
+  requirements_file: planning/stories/SAL-026.md
+  code_impact:
+    planned:
+    - path: infra/recovery/
+      action: create
+    - path: docs/operations/restore.md
+      action: create
+    - path: backend/tests/operations/test_recovery.py
+      action: create
+    actual: []
+  verification:
+    planned:
+    - Acceptance walkthrough for SAL-026 with recorded results
+    - Relevant negative-path integration tests using lawful synthetic fixtures
+    evidence: []
+  implementation:
+    pull_request: null
+    commits: []
+    notes: []
+- id: SAL-027
+  epic_id: EPIC-07
+  title: Complete security and safety boundary assessment
+  status: planned
+  priority: P0
+  assignee: null
+  depends_on:
+  - SAL-012
+  - SAL-016
+  - SAL-019
+  - SAL-021
+  - SAL-022
+  - SAL-023
+  - SAL-024
+  - SAL-025
+  - SAL-026
+  blocked_by_decisions: []
+  requirements_file: planning/stories/SAL-027.md
+  code_impact:
+    planned:
+    - path: backend/tests/security/
+      action: create
+    - path: apps/web/tests/security/
+      action: create
+    - path: docs/security/launch-assessment.md
+      action: create
+    actual: []
+  verification:
+    planned:
+    - Acceptance walkthrough for SAL-027 with recorded results
+    - Relevant negative-path integration tests using lawful synthetic fixtures
+    evidence: []
+  implementation:
+    pull_request: null
+    commits: []
+    notes: []
+- id: SAL-028
+  epic_id: EPIC-07
+  title: Complete localized accessible advertiser and visitor journeys
+  status: planned
+  priority: P0
+  assignee: null
+  depends_on:
+  - SAL-012
+  - SAL-016
+  - SAL-019
+  - SAL-020
+  - SAL-021
+  - SAL-022
+  - SAL-023
+  blocked_by_decisions: []
+  requirements_file: planning/stories/SAL-028.md
+  code_impact:
+    planned:
+    - path: apps/web/src/locales/
+      action: create
+    - path: apps/web/tests/journeys/
+      action: create
+    - path: docs/product/pilot-usability.md
+      action: create
+    actual: []
+  verification:
+    planned:
+    - Acceptance walkthrough for SAL-028 with recorded results
+    - Relevant negative-path integration tests using lawful synthetic fixtures
+    evidence: []
+  implementation:
+    pull_request: null
+    commits: []
+    notes: []
+- id: SAL-029
+  epic_id: EPIC-08
+  title: Approve supervised paid-pilot readiness
+  status: planned
+  priority: P0
+  assignee: null
+  depends_on:
+  - SAL-001
+  - SAL-002
+  - SAL-003
+  - SAL-004
+  - SAL-005
+  - SAL-006
+  - SAL-007
+  - SAL-008
+  - SAL-009
+  - SAL-010
+  - SAL-011
+  - SAL-012
+  - SAL-013
+  - SAL-014
+  - SAL-015
+  - SAL-016
+  - SAL-017
+  - SAL-018
+  - SAL-019
+  - SAL-020
+  - SAL-021
+  - SAL-022
+  - SAL-023
+  - SAL-024
+  - SAL-025
+  - SAL-026
+  - SAL-027
+  - SAL-028
+  blocked_by_decisions:
+  - ARC-001
+  - ARC-002
+  - ARC-003
+  - ARC-004
+  - ARC-005
+  - ARC-006
+  - ARC-007
+  - ARC-008
+  requirements_file: planning/stories/SAL-029.md
+  code_impact:
+    planned:
+    - path: docs/pilot/readiness.md
+      action: create
+    - path: docs/pilot/measurement-plan.md
+      action: create
+    - path: docs/operations/release.md
+      action: create
+    actual: []
+  verification:
+    planned:
+    - Acceptance walkthrough for SAL-029 with recorded results
+    - Named specialist review and evidence references; record any no-go outcome
+    evidence: []
+  implementation:
+    pull_request: null
+    commits: []
+    notes: []
+- id: SAL-030
+  epic_id: EPIC-08
+  title: Observe pilot safety, retention and unit economics
+  status: planned
+  priority: P0
+  assignee: null
+  depends_on:
+  - SAL-029
+  blocked_by_decisions: []
+  requirements_file: planning/stories/SAL-030.md
+  code_impact:
+    planned:
+    - path: docs/pilot/observation.md
+      action: create
+    - path: docs/pilot/review.md
+      action: create
+    actual: []
+  verification:
+    planned:
+    - Acceptance walkthrough for SAL-030 with recorded results
+    - Named specialist review and evidence references; record any no-go outcome
+    evidence: []
+  implementation:
+    pull_request: null
+    commits: []
+    notes: []
+- id: SAL-031
+  epic_id: EPIC-08
+  title: Prepare Netherlands expansion
+  status: planned
+  priority: P1
+  assignee: null
+  depends_on:
+  - SAL-030
+  blocked_by_decisions:
+  - ARC-009
+  requirements_file: planning/stories/SAL-031.md
+  code_impact:
+    planned:
+    - path: docs/launch/netherlands.md
+      action: create
+    - path: backend/salon/countries/policies/nl.yaml
+      action: create
+    - path: apps/web/tests/launch/nl.spec.ts
+      action: create
+    actual: []
+  verification:
+    planned:
+    - Acceptance walkthrough for SAL-031 with recorded results
+    - Named specialist review and evidence references; record any no-go outcome
+    evidence: []
+  implementation:
+    pull_request: null
+    commits: []
+    notes: []
+- id: SAL-032
+  epic_id: EPIC-08
+  title: Prepare Switzerland expansion
+  status: planned
+  priority: P1
+  assignee: null
+  depends_on:
+  - SAL-030
+  blocked_by_decisions:
+  - ARC-010
+  requirements_file: planning/stories/SAL-032.md
+  code_impact:
+    planned:
+    - path: docs/launch/switzerland.md
+      action: create
+    - path: backend/salon/countries/policies/ch.yaml
+      action: create
+    - path: apps/web/tests/launch/ch.spec.ts
+      action: create
+    actual: []
+  verification:
+    planned:
+    - Acceptance walkthrough for SAL-032 with recorded results
+    - Named specialist review and evidence references; record any no-go outcome
+    evidence: []
+  implementation:
+    pull_request: null
+    commits: []
+    notes: []
