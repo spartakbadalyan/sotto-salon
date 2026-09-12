@@ -1,0 +1,11 @@
+# Normalize line endings to LF in the repository for all text files, so a clean
+# checkout never shows spurious CRLF-only diffs across Windows/macOS/Linux.
+* text=auto eol=lf
+
+# Common binary types (guard against accidental text normalization).
+*.png  binary
+*.jpg  binary
+*.jpeg binary
+*.gif  binary
+*.ico  binary
+*.pdf  binary
