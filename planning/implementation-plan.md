@@ -5,8 +5,8 @@ Build one-country, individually owned listings first. Phases follow story depend
 | Phase | Stories | Indicative window | Exit evidence |
 | --- | --- | --- | --- |
 | 0 — Feasibility | SAL-001–006 | 2–6+ weeks; external response time unbounded | Country memo, compliance design, exact-model provider eligibility and priced operations |
-| 1 — Foundation | SAL-007–009 | 2–3 weeks | Reproducible app, CI/staging and account security using synthetic data |
-| 2 — Identity and profiles | SAL-010–016 | 4–6 weeks | Verification, country/visitor controls, quarantine, review and revocable publication |
+| 1 — Foundation | SAL-007–009, SAL-033 | 2–3 weeks | Reproducible app, CI/staging, account security and transactional notifications using synthetic data |
+| 2 — Identity and profiles | SAL-010–016, SAL-034 | 4–6 weeks | Verification, country/visitor controls, visitor consent, quarantine, review and revocable publication |
 | 3 — Subscription and redress | SAL-017–023 | 3–5 weeks, partly alongside phase 2 | Subscription lifecycle, notices, appeals and authority workflows |
 | 4 — Operational readiness | SAL-024–029 | 3–4 weeks | Privacy, monitoring, recovery, independent security review and launch evidence |
 | 5 — Observe and expand | SAL-030, then SAL-031/032 independently | 4–6 weeks observation; expansion separately estimated | Continue/narrow/stop decision; per-territory approval before enabling |

@@ -148,6 +148,7 @@ epics:
   - SAL-007
   - SAL-008
   - SAL-009
+  - SAL-033
 - id: EPIC-03
   title: Identity and jurisdiction access
   status: planned
@@ -156,6 +157,7 @@ epics:
   - SAL-010
   - SAL-011
   - SAL-012
+  - SAL-034
 - id: EPIC-04
   title: Profiles, media and publication
   status: planned
@@ -752,6 +754,7 @@ stories:
   depends_on:
   - SAL-016
   - SAL-018
+  - SAL-033
   blocked_by_decisions:
   - ARC-004
   - ARC-008
@@ -785,6 +788,7 @@ stories:
   - SAL-009
   - SAL-015
   - SAL-016
+  - SAL-033
   blocked_by_decisions: []
   requirements_file: planning/stories/SAL-020.md
   code_impact:
@@ -813,6 +817,7 @@ stories:
   assignee: null
   depends_on:
   - SAL-020
+  - SAL-033
   blocked_by_decisions: []
   requirements_file: planning/stories/SAL-021.md
   code_impact:
@@ -904,7 +909,9 @@ stories:
   depends_on:
   - SAL-002
   - SAL-010
+  - SAL-013
   - SAL-014
+  - SAL-016
   - SAL-019
   - SAL-020
   blocked_by_decisions:
@@ -938,7 +945,9 @@ stories:
   depends_on:
   - SAL-008
   - SAL-010
+  - SAL-011
   - SAL-015
+  - SAL-016
   - SAL-019
   - SAL-020
   blocked_by_decisions: []
@@ -1044,6 +1053,7 @@ stories:
   - SAL-021
   - SAL-022
   - SAL-023
+  - SAL-034
   blocked_by_decisions: []
   requirements_file: planning/stories/SAL-028.md
   code_impact:
@@ -1099,6 +1109,8 @@ stories:
   - SAL-026
   - SAL-027
   - SAL-028
+  - SAL-033
+  - SAL-034
   blocked_by_decisions:
   - ARC-001
   - ARC-002
@@ -1206,6 +1218,65 @@ stories:
     planned:
     - Acceptance walkthrough for SAL-032 with recorded results
     - Named specialist review and evidence references; record any no-go outcome
+    evidence: []
+  implementation:
+    pull_request: null
+    commits: []
+    notes: []
+- id: SAL-033
+  epic_id: EPIC-02
+  title: Deliver transactional notifications without leaking sensitive data
+  status: planned
+  priority: P0
+  assignee: null
+  depends_on:
+  - SAL-007
+  blocked_by_decisions:
+  - ARC-005
+  requirements_file: planning/stories/SAL-033.md
+  code_impact:
+    planned:
+    - path: backend/salon/notifications/
+      action: create
+    - path: backend/workers/notifications.py
+      action: create
+    - path: backend/tests/notifications/
+      action: create
+    actual: []
+  verification:
+    planned:
+    - Acceptance walkthrough for SAL-033 with recorded results
+    - Relevant negative-path integration tests using lawful synthetic fixtures
+    evidence: []
+  implementation:
+    pull_request: null
+    commits: []
+    notes: []
+- id: SAL-034
+  epic_id: EPIC-03
+  title: Implement visitor consent and ePrivacy controls
+  status: planned
+  priority: P0
+  assignee: null
+  depends_on:
+  - SAL-002
+  - SAL-007
+  blocked_by_decisions:
+  - ARC-002
+  requirements_file: planning/stories/SAL-034.md
+  code_impact:
+    planned:
+    - path: backend/salon/consent/
+      action: create
+    - path: apps/web/src/features/consent/
+      action: create
+    - path: backend/tests/consent/
+      action: create
+    actual: []
+  verification:
+    planned:
+    - Acceptance walkthrough for SAL-034 with recorded results
+    - Relevant negative-path integration tests using lawful synthetic fixtures
     evidence: []
   implementation:
     pull_request: null
