@@ -9,7 +9,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from salon import __version__
-from salon.api.routes import health, meta
+from salon.api.routes import auth, health, meta
 from salon.core.adapters import assert_adapters_allowed
 from salon.core.config import Settings, get_settings
 from salon.core.logging import configure_logging
@@ -45,4 +45,5 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     )
     app.include_router(health.router)
     app.include_router(meta.router, prefix=API_PREFIX)
+    app.include_router(auth.router, prefix=API_PREFIX)
     return app

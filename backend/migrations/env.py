@@ -15,6 +15,7 @@ from sqlalchemy import engine_from_config, pool
 from salon.core import db as _db  # noqa: F401
 from salon.core.config import load_settings
 from salon.core.db import Base
+from salon.identity import models as _identity_models  # noqa: F401
 
 config = context.config
 target_metadata = Base.metadata

@@ -619,7 +619,7 @@ stories:
 - id: SAL-009
   epic_id: EPIC-02
   title: Implement advertiser accounts and staff authorization
-  status: planned
+  status: in_progress
   priority: P0
   assignee: null
   depends_on:
@@ -634,16 +634,53 @@ stories:
       action: create
     - path: backend/tests/identity/
       action: create
-    actual: []
+    actual:
+    - path: backend/salon/identity/models.py
+      action: create
+    - path: backend/salon/identity/sessions.py
+      action: create
+    - path: backend/salon/identity/authorization.py
+      action: create
+    - path: backend/salon/identity/dependencies.py
+      action: create
+    - path: backend/salon/api/routes/auth.py
+      action: create
+    - path: backend/salon/api/app.py
+      action: modify
+    - path: backend/migrations/env.py
+      action: modify
+    - path: backend/migrations/versions/0002_identity_accounts.py
+      action: create
+    - path: backend/tests/identity/__init__.py
+      action: create
+    - path: backend/tests/identity/test_authorization.py
+      action: create
+    - path: backend/tests/identity/test_sessions_api.py
+      action: create
+    - path: apps/web/src/features/auth/api.ts
+      action: create
+    - path: contracts/openapi/openapi.json
+      action: modify
   verification:
     planned:
     - Acceptance walkthrough for SAL-009 with recorded results
     - Relevant negative-path integration tests using lawful synthetic fixtures
-    evidence: []
+    evidence:
+    - '2026-09-13 initial slice: pytest 34 passed; negative paths cover cross-account ownership,
+      staff MFA, separate role permissions, invalid CSRF, immediate logout/global revocation,
+      expired/suspended sessions, and indistinguishable missing/unknown-session responses.'
+    - '2026-09-13 ruff check clean; web TypeScript and ESLint clean; OpenAPI-generated contract
+      TypeScript clean; Alembic upgraded 0001 -> 0002 and downgraded to base on disposable SQLite.'
   implementation:
     pull_request: null
     commits: []
-    notes: []
+    notes:
+    - 'Started on branch feature/sal-009-advertiser-accounts. Accounts, opaque HMAC-protected
+      sessions, CSRF-checked logout, ownership policy, MFA-gated scoped staff roles, audit-ready
+      role grant persistence, and the minimal current-user API/web client are implemented.'
+    - 'Story remains in progress: verified registration, password authentication, MFA enrollment
+      and challenge, recovery, reauthentication, rate limiting, and role-grant service/API flows
+      are not implemented. No real advertiser or staff data is involved.'
 - id: SAL-010
   epic_id: EPIC-03
   title: Integrate advertiser KYC and consent-aware onboarding
